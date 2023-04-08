@@ -8,7 +8,7 @@ from load_data import *
 def generate_recommendation(user_id = None, title = None, no_cf = False):
     if user_id != None:   # When given user_id, will use user_id for giving recommendation
         if user_id not in users['user_id']:
-            raise ValueError("No existing user with this id. Please register first")
+            raise HTTPException(status_code=404, detail="No existing user with this id. Please register first")
         try: # Collaborative filtering will fail if user have no ratings for famous books
             if no_cf:
                 raise Exception('Request asked for no collaborative filtering')
@@ -39,7 +39,7 @@ book_ratings = pd.merge(ratings, books, on='isbn')
 u_ratings = get_u_ratings(book_ratings)
 pt, item_similarity = user_based_cf(book_ratings)
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 app = FastAPI()
 
 # Get recommendation for user, will use cf model when possible.
@@ -62,27 +62,28 @@ async def user_rec_tf(user_id):
 async def book_rec_tf(title):
     return generate_recommendation(title = title, no_cf= True)
 
-# Get recommendation for book with traditional filtering.
+# [Fail] Register new user via API
 @app.post("/api/v1/user/register")
-async def user_register(age = np.nan, location = np.nan):
-    user_id = users[users['user_id']].max()+1
-    new_user = {'user_id':user_id,
+async def user_register(age, location):
+    # user_id = users[users['user_id']].max+1
+    new_user = {'user_id': 42,
                 'age':age,
                 'location':location}
-    users = users.concat(new_user, ignore_index=True)
+    # users = users.concat(new_user, ignore_index=True)
     return new_user
 
+# [Fail] Post new rating for user
 @app.post("/api/v1/user/rating")
-async def submit_rating(user_id, rating, title=None, isbn=None):
+async def submit_rating(user_id, rating, isbn, title):
     if title != None:
         try:
-            isbn = books[books['title']==title]['isbn'].iloc[0]
+            isbn = '0971880107' #books[books['title']==title]['isbn'].iloc[0]
         except:
-            raise ValueError('No book with such title!')
+            raise HTTPException(status_code=404, detail='No book with such title!')
     if isbn != None:
         new_rating = {'user_id':user_id,
                       'rating':rating,
                       'isbn':isbn}
-        ratings = ratings.concat(new_rating, ignore_index=True)
+        # ratings = ratings.concat(new_rating, ignore_index=True)
     return new_rating
 
