@@ -5,9 +5,14 @@ from traditional_filtering import *
 from collaborative_filtering import *
 from load_data import *
 
+# Load data
+books = load_books()
+ratings = load_ratings()
+users = load_users()
+
 def generate_recommendation(user_id = None, title = None, no_cf = False):
     if user_id != None:   # When given user_id, will use user_id for giving recommendation
-        if user_id not in users['user_id']:
+        if not user_id in list(users['user_id']):
             raise HTTPException(status_code=404, detail="No existing user with this id. Please register first")
         try: # Collaborative filtering will fail if user have no ratings for famous books
             if no_cf:
@@ -30,11 +35,6 @@ def generate_recommendation(user_id = None, title = None, no_cf = False):
     # Convert recommendation df into json for API
     return rec_df[['isbn','title','author','year','pub','Image-URL-L']].to_dict(orient="records")
 
-# Load data
-books = load_books()
-ratings = load_ratings()
-users = load_users()
-
 book_ratings = pd.merge(ratings, books, on='isbn')
 u_ratings = get_u_ratings(book_ratings)
 pt, item_similarity = user_based_cf(book_ratings)
@@ -45,7 +45,7 @@ app = FastAPI()
 # Get recommendation for user, will use cf model when possible.
 @app.get("/api/v1/rec/user")
 async def user_rec(user_id):
-    return generate_recommendation(user_id = user_id)
+    return generate_recommendation(user_id = int(user_id))
 
 # Get recommendation for book, will use cf model when possible.
 @app.get("/api/v1/rec/book")
