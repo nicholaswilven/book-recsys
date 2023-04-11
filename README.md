@@ -16,11 +16,9 @@ Notes:
 In addition of above mentioned method, I also tried to implement Personalized Page Rank algorithm and Knowledge Graph method. Personalized Page Rank fails since have too many nodes in a graph, making the score for books too low for sorting. Knowlegde Graph based method are not suitable for current data features (need more features to induce connection between books).
 
 API:
-- /api/v1/rec/user?user_id=XX : gives top 10 recommendation for user with user_id XX. Model used to generate recommendation defaults to [1], in case failed will use [2b]. then [2a].
-- /api/v1/rec/book?title=XX : gives top 10 recommendation for book similar to book with title XX. Model used to generate recommendation defaults to [1], in case failed will use [2c].
-- /api/v1/rec_tf/user?user_id=XX : gives top 10 recommendation for user with user_id XX. Model used to generate recommendation defaults [2b] then [2a].
-- /api/v1/rec_tf/book?title=XX : gives top 10 recommendation for book similar to book with title XX. Model used to generate recommendation defaults to [2c].
-    
+- /api/v1/rec/user?user_id=XX&no_cf=YY : gives top 10 recommendation for user with user_id XX. Model used to generate recommendation defaults to [1], in case failed will use [2b]. then [2a]. If YY=True, recommendation won't use [1], YY defaults to False.
+- /api/v1/rec/book?title=XX&no_cf=YY : gives top 10 recommendation for book similar to book with title XX. Model used to generate recommendation defaults to [1], in case failed will use [2c]. If YY=True, recommendation wont't use [1], YY defaults to False.
+
 Quick Start Guide:
 1. Install requirements ```pip install -r requirements.txt```
 2. Place "Books.csv", "Users.csv", "Ratings.csv" to folder "data"
